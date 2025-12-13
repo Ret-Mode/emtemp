@@ -1,2 +1,4 @@
 emcmake cmake -B_ebuild -H.
-cmake --build _ebuild
+pushd _ebuild 
+emmake make 
+popd

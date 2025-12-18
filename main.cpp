@@ -1,21 +1,41 @@
 #include <iostream>
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <emscripten/html5.h>
+#endif
 #include <SDL2/SDL.h>
-bool one_iter(double time, void* userData) {
-  return true;
+
+void initialize_the_game() {}
+void deinitialize_the_game() {}
+void check_for_new_input() {}
+void think_about_stuff() {}
+void draw_the_next_frame() {}
+bool game_is_still_running = true;
+
+static void mainloop(void)   /* this will run often, possibly at the monitor's refresh rate */
+{
+  if (!game_is_still_running) {
+    deinitialize_the_game();
+  #ifdef __EMSCRIPTEN__
+    emscripten_cancel_main_loop();  /* this should "kill" the app. */
+  #else
+    exit(0);
+  #endif
+  }
+
+  check_for_new_input();
+  think_about_stuff();
+  draw_the_next_frame();
 }
 
 int main() {
-#ifdef __EMSCRIPTEN__
-  // Receives a function to call and some user data to provide it.
-  emscripten_request_animation_frame_loop(one_iter, 0);
-#else
-  while (1) {
-    one_iter();
-    // Delay to keep frame rate constant (using SDL).
-    SDL_Delay(1);
-  }
-#endif
+
+  initialize_the_game();
+  #ifdef __EMSCRIPTEN__
+  emscripten_set_main_loop(mainloop, 0, 1);
+  #else
+  while (1) { mainloop(); }
+  #endif
+
 return 0;
 }

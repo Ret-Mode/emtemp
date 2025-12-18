@@ -12,12 +12,19 @@ const server = http.createServer((req,res) => {
         res.writeHead(200);
         res.end("Error");
       }
-      res.writeHead(200);
+      if (url.endsWith('wasm')){
+        res.writeHead(200, {'content-type':'application/wasm'});
+      } else if (url.endsWith('html')){
+        res.writeHead(200, {'content-type':'text/html'});
+      } else {
+        res.writeHead(200);
+      }
+      
       res.end(data);
     })
   } else {
     res.writeHead(200);
-    res.end(data);
+    res.end();
   }
 });
 server.listen(9876);

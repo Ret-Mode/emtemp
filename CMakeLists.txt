@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 set (CMAKE_CXX_STANDARD 11)
-project(initproj)
+project(initproj LANGUAGES CXX)
 
 add_executable(template)
 target_sources(template PRIVATE src/main.cpp)
 
 if(${EMSCRIPTEN})
+  set(CMAKE_VERBOSE_MAKEFILE ON)
   target_sources(template PRIVATE src/em_main.cpp)
   target_compile_options(template PRIVATE --use-port=sdl2)
   target_link_options(template PRIVATE --use-port=sdl2)

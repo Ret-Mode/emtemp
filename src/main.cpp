@@ -13,7 +13,7 @@ void init() {
   }
 
   video.window = SDL_CreateWindow(
-    "Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 500, 500, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
+    "Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 500, 500, SDL_WINDOW_SHOWN
   );
 
   if (!video.window) {
@@ -48,6 +48,8 @@ void update() {
       case SDL_QUIT:
       video.running = false;
       break;
+     default:
+     break;
     }
 
 	}

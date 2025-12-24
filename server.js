@@ -6,25 +6,37 @@ const server = http.createServer((req,res) => {
   if (url === "./") {
     url = "./template.html"
   }
+  console.log(url);
   if (fs.existsSync(url)){
     fs.readFile(url, (err, data) => {
       if (err) {
-        res.writeHead(200);
-        res.end("Error");
+        console.log("error");
+        res.writeHead(400);
       }
-      if (url.endsWith('wasm')){
-        res.writeHead(200, {'content-type':'application/wasm'});
-      } else if (url.endsWith('html')){
-        res.writeHead(200, {'content-type':'text/html'});
-      } else {
-        res.writeHead(200);
-      }
-      
-      res.end(data);
-    })
+      else {
+        if (url.endsWith('wasm')){
+          res.writeHead(200, {'content-type':'application/wasm'});
+          console.log("wasm");
+        } else if (url.endsWith('html')){
+          res.writeHead(200, {'content-type':'text/html'});
+          console.log("html");
+        } else if (url.endsWith('js')){
+          res.writeHead(200, {'content-type':'text/javascript'});
+          console.log("js");
+        } else if (url.endsWith('css')){
+          res.writeHead(200, {'content-type':'text/css'});
+          console.log("css");
+        } else {
+          res.writeHead(200);
+          console.log("other " + url);
+        }
+        console.log(data);
+        res.end(data);
+        }
+    });
   } else {
     res.writeHead(200);
-    res.end();
+    res.end("");
   }
 });
 server.listen(9876);

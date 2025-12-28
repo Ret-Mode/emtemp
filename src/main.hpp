@@ -1,10 +1,11 @@
 #ifndef __TEMP_MAIN_HPP
 #define __TEMP_MAIN_HPP
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include <SDL.h>
+#include <SDL_image.h>
 
-struct sdl_container {
+struct sdl_container
+{
   SDL_Window *window;
   SDL_Renderer *renderer;
   SDL_Texture *backbuffer;

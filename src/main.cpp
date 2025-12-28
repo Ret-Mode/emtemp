@@ -22,11 +22,19 @@ void init()
     return;
   }
 
+ 
+  SDL_Rect r;
+  SDL_GetDisplayBounds(0, &r);
+  SDL_Log(" init box %d %d %d %d", r.x, r.y, r.w, r.h);
+  //SDL_SetWindowSize(video.window, r.w, r.h);
+ 
   video.window = SDL_CreateWindow(
-      "Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 500, 500, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
+    "Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, r.w, r.h, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE
+  );
+  
+  video.sceneWidth = r.w;
+  video.sceneHeight = r.h;
 
-  video.sceneWidth = 500;
-  video.sceneHeight = 500;
 
   if (!video.window)
   {
@@ -41,10 +49,16 @@ void init()
     return;
   }
 
-  // SDL_RenderSetLogicalSize(video.renderer, 200,200);
+  
+  SDL_RenderSetLogicalSize(video.renderer, 200,200);
+  
 
   SDL_RendererInfo rendererInfo;
   SDL_GetRendererInfo(video.renderer, &rendererInfo);
+  SDL_version ver;
+  SDL_GetVersion(&ver);
+  SDL_Log("Version %d %d %d",ver.major, ver.minor, ver.patch );
+  SDL_Log("Revision %s", SDL_GetRevision());
   SDL_Log("Renderer: %s", rendererInfo.name);
 
   video.pixelRatio = 1.0f;

@@ -50,7 +50,7 @@ void init()
   }
 
   
-  SDL_RenderSetLogicalSize(video.renderer, 200,200);
+  //SDL_RenderSetLogicalSize(video.renderer, 200,200);
   
 
   SDL_RendererInfo rendererInfo;
@@ -107,6 +107,7 @@ void update()
     {
       SDL_TouchFingerEvent ev = event.tfinger;
       drawRect(ev.x, ev.y, 230);
+      SDL_Log("motion %f %f", ev.x, ev.y);
     }
     break;
     case SDL_FINGERDOWN:
@@ -119,7 +120,14 @@ void update()
     {
       SDL_TouchFingerEvent ev = event.tfinger;
       drawRect(ev.x, ev.y, 230);
-      // SDL_SetWindowFullscreen(video.window, true);
+      if (ev.x<0.25f && ev.y<0.25f) {
+        SDL_SetWindowFullscreen(video.window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+      } else if (ev.x<0.25f && ev.y>0.75f) {
+        SDL_SetWindowFullscreen(video.window, SDL_WINDOW_FULLSCREEN);
+      } else if (ev.x>0.75f && ev.y>0.75f) {
+        SDL_SetWindowFullscreen(video.window, 0);
+      }
+      
     }
     break;
     case SDL_SYSWMEVENT:
@@ -162,7 +170,7 @@ void update()
       case SDL_WINDOWEVENT_SHOWN:
         SDL_Log("SDL_WINDOWEVENT_SHOWN");
         {
-          toggleFullscreen();
+          //toggleFullscreen();
           /*SDL_SetWindowResizable(video.window, true);
           SDL_Rect r;
           SDL_GetDisplayBounds(0, &r);

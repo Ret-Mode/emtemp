@@ -1,3 +1,3 @@
 pushd _ebuild
-emmake make
+ninja
 popd

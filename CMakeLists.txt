@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.10)
 set (CMAKE_CXX_STANDARD 11)
 
 project(initproj LANGUAGES CXX)
@@ -14,19 +14,14 @@ target_sources(template PRIVATE src/main.cpp)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets/Image5.png
       DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/assets)
 #file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets/test.xm
-      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/assets)
+#      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/assets)
       
 if(${EMSCRIPTEN})
 
   set(CMAKE_VERBOSE_MAKEFILE ON)
   
   if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    #message("debug")
-    #target_compile_options(template PRIVATE -v)
-    #target_compile_options(template PRIVATE -sSTACK_OVERFLOW_CHECK=2)
-    #target_compile_options(template PRIVATE -sCHECK_NULL_WRITES=1)
-    #target_compile_options(template PRIVATE -sVERBOSE=1)
-    #target_compile_options(template PRIVATE -sRUNTIME_DEBUG=2)
+
     target_compile_options(template PRIVATE -gsource-map)
     
     target_link_options(template PRIVATE -v)
@@ -36,9 +31,13 @@ if(${EMSCRIPTEN})
     target_link_options(template PRIVATE -sVERBOSE=1)
     target_link_options(template PRIVATE -sRUNTIME_DEBUG=2)
     target_link_options(template PRIVATE -gsource-map)
+
   elseif(${CMAKE_BUILD_TYPE} IN_LIST "Release")
+
     message("release")
+
   endif()
+
   target_sources(template PRIVATE src/em_main.cpp)
   
   target_compile_options(template PRIVATE --use-port=sdl2)
@@ -59,15 +58,13 @@ else()
 
   find_package(SDL2)
   find_package(SDL2_image)
+  find_package(SDL2_mixer)
   target_sources(template PRIVATE src/desktop_main.cpp)
 
-  #target_include_directories(template PRIVATE ${SDL2_INCLUDE_DIRS})
-  #target_link_libraries(template PRIVATE ${SDL2_LIBRARIES})
-
-  target_include_directories(template PRIVATE SDL2::SDL2)
-  target_include_directories(template PRIVATE SDL2_image::SDL2_image)
+  target_link_libraries(template PRIVATE SDL2_mixer::SDL2_mixer)
   target_link_libraries(template PRIVATE SDL2_image::SDL2_image)
-  target_link_libraries(template PRIVATE  SDL2::SDL2 SDL2::SDL2main)
+  target_link_libraries(template PRIVATE SDL2::SDL2 SDL2::SDL2main)
+  
 
   if (WIN32)
     add_custom_command(TARGET template POST_BUILD

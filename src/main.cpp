@@ -17,19 +17,22 @@ void toggleFullscreen()
 void init()
 {
 
-  if (SDL_Init(SDL_INIT_VIDEO))
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER))
   {
+    cleanup();
     return;
   }
 
  
   SDL_Rect r;
   SDL_GetDisplayBounds(0, &r);
-  SDL_Log(" init box %d %d %d %d", r.x, r.y, r.w, r.h);
+  //SDL_Log(" init box %d %d %d %d", r.x, r.y, r.w, r.h);
   //SDL_SetWindowSize(video.window, r.w, r.h);
  
   video.window = SDL_CreateWindow(
-    "Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, r.w, r.h, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE
+    "Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 300, 200, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL 
+    | SDL_WINDOW_ALLOW_HIGHDPI 
+    | SDL_WINDOW_RESIZABLE
   );
   
   video.sceneWidth = r.w;
@@ -38,6 +41,7 @@ void init()
 
   if (!video.window)
   {
+    cleanup();
     return;
   }
 
@@ -46,13 +50,12 @@ void init()
 
   if (!video.renderer)
   {
+    cleanup();
     return;
   }
 
-  
   //SDL_RenderSetLogicalSize(video.renderer, 200,200);
   
-
   SDL_RendererInfo rendererInfo;
   SDL_GetRendererInfo(video.renderer, &rendererInfo);
   SDL_version ver;
@@ -62,18 +65,55 @@ void init()
   SDL_Log("Renderer: %s", rendererInfo.name);
 
   video.pixelRatio = 1.0f;
-  video.running = true;
+  
 
-  IMG_Init(IMG_INIT_PNG);
+  if (IMG_Init(IMG_INIT_PNG)<0) {
+    SDL_Log("Png failed");
+    cleanup();
+    return;
+  }
+  
   video.img = IMG_LoadTexture(video.renderer, "assets/Image5.png");
+  
+  if (Mix_Init(MIX_INIT_MOD)<0) {
+    SDL_Log("mod failed");
+    cleanup();
+    return;
+  }
+  if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 4096) ) {
+    SDL_Log("audio device failed");
+    cleanup();
+    return;
+  }
+  
+  video.mus = Mix_LoadMUS("assets/test.xm");
+  video.running = true;
 }
 
 void cleanup()
 {
-  SDL_DestroyTexture(video.img);
+  SDL_Log("Cleanup");
+  if (video.mus){
+    Mix_HaltMusic();
+    Mix_FreeMusic(video.mus);
+  }
+  
+  Mix_CloseAudio();
+  Mix_Quit();
+  
+  if (video.img) {
+    SDL_DestroyTexture(video.img);
+  }
+  
   IMG_Quit();
-  SDL_DestroyRenderer(video.renderer);
-  SDL_DestroyWindow(video.window);
+  
+  if (video.renderer) {
+    SDL_DestroyRenderer(video.renderer);
+  }
+  if (video.window) {
+    SDL_DestroyWindow(video.window);
+  }
+  
   SDL_Quit();
 }
 
@@ -95,9 +135,10 @@ void update()
 {
 
   SDL_Event event;
-
+  
   while (SDL_PollEvent(&event))
   {
+    SDL_Log("* %x", event.type);
     switch (event.type)
     {
     case SDL_QUIT:
@@ -114,18 +155,31 @@ void update()
     {
       SDL_TouchFingerEvent ev = event.tfinger;
       drawRect(ev.x, ev.y, 230);
+      Mix_PlayMusic(video.mus, 1);
     }
     break;
     case SDL_FINGERUP:
     {
       SDL_TouchFingerEvent ev = event.tfinger;
       drawRect(ev.x, ev.y, 230);
+      Uint32 flags = SDL_GetWindowFlags(video.window);
+	
       if (ev.x<0.25f && ev.y<0.25f) {
-        SDL_SetWindowFullscreen(video.window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+        if(flags & SDL_WINDOW_FULLSCREEN) {
+          SDL_SetWindowFullscreen(video.window, 0);
+        } else {
+          SDL_SetWindowFullscreen(video.window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+        }
       } else if (ev.x<0.25f && ev.y>0.75f) {
-        SDL_SetWindowFullscreen(video.window, SDL_WINDOW_FULLSCREEN);
+        if(flags & SDL_WINDOW_FULLSCREEN) {
+          SDL_SetWindowFullscreen(video.window, 0);
+        } else {
+          SDL_SetWindowFullscreen(video.window, SDL_WINDOW_FULLSCREEN);
+        }
       } else if (ev.x>0.75f && ev.y>0.75f) {
-        SDL_SetWindowFullscreen(video.window, 0);
+        incWindow();
+      } else if (ev.x>0.75f && ev.y<0.25f) {
+        incSurface();
       }
       
     }
@@ -190,11 +244,21 @@ void update()
       case SDL_WINDOWEVENT_RESIZED:
         SDL_Log("SDL_WINDOWEVENT_RESIZED");
         {
+          SDL_Rect r;
+          r.x = r.y = 0;
+          r.w = ev.data1 * video.pixelRatio;
+          r.h = ev.data2 * video.pixelRatio;
           video.sceneWidth = ev.data1;
           video.sceneHeight = ev.data2;
-          char msg[40];
-          sprintf(msg, "%d %d", ev.data1, ev.data2);
-          SDL_Log("%s", msg);
+          SDL_Log( "Resized to %d %d", ev.data1, ev.data2);
+          
+          logSize();
+          //SDL_RenderSetViewport(video.renderer, &r);
+          
+          // emscripten_get_device_pixel_ratio()
+          //.emscripten_get_screen_size(int *width, int *height)
+          //emscripten_get_element_css_size(const char *target, double *width, double *height)
+          //emscripten_get_canvas_element_size(const char *target, int *width, int *height) 
         }
         break;
       case SDL_WINDOWEVENT_SIZE_CHANGED:

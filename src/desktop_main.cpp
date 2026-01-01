@@ -8,6 +8,10 @@ static void mainloop(void) {
   draw();
 }
 
+void logSize(){
+  
+}
+
 int main() {
   init();
   while (1) { mainloop(); }

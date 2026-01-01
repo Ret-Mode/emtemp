@@ -3,6 +3,7 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_mixer.h>
 
 struct sdl_container
 {
@@ -10,6 +11,7 @@ struct sdl_container
   SDL_Renderer *renderer;
   SDL_Texture *backbuffer;
   SDL_Texture *img;
+  Mix_Music *mus;
   float pixelRatio;
   int sceneWidth;
   int sceneHeight;
@@ -24,5 +26,7 @@ void update();
 void draw();
 void startFrame();
 void drawFrame();
-
+void logSize();
+void incWindow();
+void incSurface();
 #endif //__TEMP_MAIN_HPP

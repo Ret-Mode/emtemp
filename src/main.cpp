@@ -61,6 +61,8 @@ void init()
   SDL_Log("Version %d %d %d", ver.major, ver.minor, ver.patch);
   SDL_Log("Revision %s", SDL_GetRevision());
   SDL_Log("Renderer: %s", rendererInfo.name);
+  SDL_Log ("Video driver: %s", SDL_GetCurrentVideoDriver());
+  
 
   video.pixelRatio = 1.0f;
 
@@ -166,14 +168,14 @@ void update()
     {
       SDL_MouseMotionEvent ev = event.motion;
       drawRect(ev.x, ev.y, 230);
-      SDL_Log("motion %d %d", ev.x, ev.y);
+      SDL_Log("mouse motion %d %d", ev.x, ev.y);
     }
     break;
     case SDL_FINGERMOTION:
     {
       SDL_TouchFingerEvent ev = event.tfinger;
       drawRect(ev.x, ev.y, 230);
-      SDL_Log("motion %f %f", ev.x, ev.y);
+      SDL_Log("finger motion %f %f", ev.x, ev.y);
     }
     break;
     case SDL_FINGERDOWN:
@@ -181,6 +183,7 @@ void update()
       SDL_TouchFingerEvent ev = event.tfinger;
       drawRect(ev.x, ev.y, 230);
       Mix_PlayMusic(video.mus, 1);
+      SDL_Log("finger down %f %f", ev.x, ev.y);
     }
     break;
     case SDL_MOUSEBUTTONDOWN:
@@ -188,8 +191,10 @@ void update()
       SDL_MouseButtonEvent ev = event.button;
       drawRect(ev.x, ev.y, 230);
       Mix_PlayMusic(video.mus, 1);
+      SDL_Log("mouse down %d %d", ev.x, ev.y);
     }
     break;
+    /*
     case SDL_MOUSEBUTTONUP:
     {
       SDL_MouseButtonEvent ev = event.button;
@@ -228,7 +233,7 @@ void update()
         incSurface();
       }
     }
-    break;
+    break;*/
     case SDL_FINGERUP:
     {
       SDL_TouchFingerEvent ev = event.tfinger;
@@ -240,10 +245,17 @@ void update()
         if (flags & SDL_WINDOW_FULLSCREEN)
         {
           SDL_SetWindowFullscreen(video.window, 0);
+          SDL_RenderSetLogicalSize(video.renderer, 100,100);
+          //SDL_RenderSetViewport(video.renderer, NULL);
         }
         else
         {
           SDL_SetWindowFullscreen(video.window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+          SDL_Rect r{0,0,100,100};
+          //SDL_RenderSetViewport(video.renderer, &r);
+          SDL_RenderSetLogicalSize(video.renderer, 0,0);
+          
+          
         }
       }
       else if (ev.x < 0.25f && ev.y > 0.75f)
@@ -251,10 +263,15 @@ void update()
         if (flags & SDL_WINDOW_FULLSCREEN)
         {
           SDL_SetWindowFullscreen(video.window, 0);
+          SDL_RenderSetViewport(video.renderer, NULL);
         }
         else
         {
+          
           SDL_SetWindowFullscreen(video.window, SDL_WINDOW_FULLSCREEN);
+          SDL_Rect r{0,0,100,100};
+          SDL_RenderSetViewport(video.renderer, &r);
+          //SDL_RenderSetLogicalSize(video.renderer, 0,0);
         }
       }
       else if (ev.x > 0.75f && ev.y > 0.75f)
@@ -413,7 +430,9 @@ void drawFrame()
 
 void draw()
 {
+  //Uint32 start = SDL_GetTicks();
   startFrame();
   update();
   drawFrame();
+  //SDL_Log("ms %d", SDL_GetTicks() - start);
 }

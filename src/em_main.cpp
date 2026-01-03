@@ -11,6 +11,74 @@ static void mainloop(void) {
   draw();
 }
 
+void init()
+{
+
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER))
+  {
+    cleanup();
+    return;
+  }
+
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,SDL_GL_CONTEXT_PROFILE_ES);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION,3);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION,0);
+  
+  SDL_Rect r;
+  SDL_GetDisplayBounds(0, &r);
+
+  video.window = SDL_CreateWindow(
+      "Test",
+      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+      300, 200,
+      SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
+
+  video.sceneWidth = r.w;
+  video.sceneHeight = r.h;
+
+
+  if (!video.window)
+  {
+    cleanup();
+    return;
+  }
+  
+  video.context = SDL_GL_CreateContext(video.window);
+  if (!video.context){
+    SDL_Log("no context");
+    cleanup();
+    return;
+  }
+  gladLoadGLES2Loader(SDL_GL_GetProcAddress);
+
+  video.pixelRatio = 1.0f;
+
+  if (IMG_Init(IMG_INIT_PNG) < 0)
+  {
+    SDL_Log("Png failed");
+    cleanup();
+    return;
+  }
+
+  //video.img = IMG_LoadTexture(video.renderer, "assets/Image5.png");
+
+  if (Mix_Init(MIX_INIT_MOD) < 0)
+  {
+    SDL_Log("mod failed");
+    cleanup();
+    return;
+  }
+  if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 4096))
+  {
+    SDL_Log("audio device failed");
+    cleanup();
+    return;
+  }
+
+  video.mus = Mix_LoadMUS("assets/test.xm");
+  video.running = true;
+}
+
 static void logDisplayMode(SDL_DisplayMode &dm) {
   SDL_Log("w %d h %d refresh %d", dm.w, dm.h, dm.refresh_rate);
 }
@@ -24,30 +92,6 @@ void logSize() {
   SDL_Rect r;
   
   SDL_Log("pixel ratio %f", emscripten_get_device_pixel_ratio());
-  void *rt = SDL_GetRenderTarget(video.renderer);
-  if (rt) {
-    SDL_Log("Rt is texture");
-  } else {
-    SDL_Log("Render to window");
-  }
-  if (SDL_RenderGetIntegerScale(video.renderer)) {
-    SDL_Log("integer scale");
-  } else {
-    SDL_Log("float scale");
-  }
-  
-  SDL_RenderGetLogicalSize(video.renderer, &iw, &ih);
-  SDL_Log("Logical size %d %d", iw, ih);
-  
-  SDL_RenderGetScale(video.renderer, &fw, &fh);
-  SDL_Log("Renderer scale %f %f", fw, fh);
-                       
-  SDL_RenderGetViewport(video.renderer, &r);
-  
-  SDL_Log( "Renderer viewport to %d %d %d %d", r.x, r.y, r.w, r.h);
-  
-  SDL_GetRendererOutputSize(video.renderer, &w, &h);
-  SDL_Log("Rend output %d %d", w, h);
   
   SDL_GetDisplayDPI(0, &ddpi,  &hdpi, &vdpi);
   SDL_Log("Dpi d %f h %f v %f", ddpi, hdpi, vdpi);
@@ -108,23 +152,8 @@ void incSurface() {
 static void setPixelRatio(){
   video.pixelRatio = (float)emscripten_get_device_pixel_ratio();
   SDL_Log("%f pixel ratio", video.pixelRatio);
-  
-  int n = SDL_GetNumRenderDrivers();
-  for (int i = 0; i < n; ++i) {
-    SDL_RendererInfo info;
-    SDL_GetRenderDriverInfo(i, &info);
-    SDL_Log("Driver %d %s", i, info.name);
-  }
 }
 
-static void setOrientation() {
-  //SDL_Rect r;
- // SDL_GetDisplayBounds(0, &r);
-  //SDL_Log("%d %d %d %d", r.x, r.y, r.w, r.h);
-  //SDL_SetWindowSize(video.window, r.w, r.h);
-  //emscripten_request_fullscreen("#canvas", true);
-  //emscripten_lock_orientation(EMSCRIPTEN_ORIENTATION_LANDSCAPE_PRIMARY);
-}
 
 int main() {
   init();

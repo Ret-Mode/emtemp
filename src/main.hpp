@@ -4,11 +4,12 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
+#include "glad/glad.h"
 
 struct sdl_container
 {
   SDL_Window *window;
-  SDL_Renderer *renderer;
+  SDL_GLContext context;
   SDL_Texture *backbuffer;
   SDL_Texture *img;
   Mix_Music *mus;

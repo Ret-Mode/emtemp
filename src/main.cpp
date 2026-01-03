@@ -6,7 +6,7 @@ sdl_container video{};
 
 void toggleFullscreen()
 {
-  // SDL_SetWindowResizable(video.window, SDL_TRUE);
+  
   SDL_SetWindowFullscreen(video.window, SDL_WINDOW_FULLSCREEN_DESKTOP);
   SDL_Rect r;
   SDL_GetDisplayBounds(0, &r);
@@ -14,83 +14,6 @@ void toggleFullscreen()
   SDL_SetWindowSize(video.window, r.w, r.h);
 }
 
-void init()
-{
-
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER))
-  {
-    cleanup();
-    return;
-  }
-
-  SDL_Rect r;
-  SDL_GetDisplayBounds(0, &r);
-  // SDL_Log(" init box %d %d %d %d", r.x, r.y, r.w, r.h);
-  // SDL_SetWindowSize(video.window, r.w, r.h);
-
-  video.window = SDL_CreateWindow(
-      "Test",
-      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-      300, 200,
-      SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
-
-  video.sceneWidth = r.w;
-  video.sceneHeight = r.h;
-
-  if (!video.window)
-  {
-    cleanup();
-    return;
-  }
-
-  video.renderer = SDL_CreateRenderer(
-      video.window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
-  if (!video.renderer)
-  {
-    cleanup();
-    return;
-  }
-
-  // SDL_RenderSetLogicalSize(video.renderer, 200,200);
-
-  SDL_RendererInfo rendererInfo;
-  SDL_GetRendererInfo(video.renderer, &rendererInfo);
-  SDL_version ver;
-  SDL_GetVersion(&ver);
-  SDL_Log("Version %d %d %d", ver.major, ver.minor, ver.patch);
-  SDL_Log("Revision %s", SDL_GetRevision());
-  SDL_Log("Renderer: %s", rendererInfo.name);
-  SDL_Log ("Video driver: %s", SDL_GetCurrentVideoDriver());
-  
-
-  video.pixelRatio = 1.0f;
-
-  if (IMG_Init(IMG_INIT_PNG) < 0)
-  {
-    SDL_Log("Png failed");
-    cleanup();
-    return;
-  }
-
-  video.img = IMG_LoadTexture(video.renderer, "assets/Image5.png");
-
-  if (Mix_Init(MIX_INIT_MOD) < 0)
-  {
-    SDL_Log("mod failed");
-    cleanup();
-    return;
-  }
-  if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 4096))
-  {
-    SDL_Log("audio device failed");
-    cleanup();
-    return;
-  }
-
-  video.mus = Mix_LoadMUS("assets/test.xm");
-  video.running = true;
-}
 
 void cleanup()
 {
@@ -111,10 +34,7 @@ void cleanup()
 
   IMG_Quit();
 
-  if (video.renderer)
-  {
-    SDL_DestroyRenderer(video.renderer);
-  }
+  
   if (video.window)
   {
     SDL_DestroyWindow(video.window);
@@ -133,8 +53,7 @@ void drawRect(Sint32 x, Sint32 y, int color)
   SDL_Rect r{
       _x, _y, _x2, _y2};
 
-  SDL_SetRenderDrawColor(video.renderer, 200, 0, color, 255);
-  SDL_RenderFillRect(video.renderer, &r);
+  
 }
 
 void drawRect(float x, float y, int color)
@@ -147,8 +66,7 @@ void drawRect(float x, float y, int color)
   SDL_Rect r{
       _x, _y, _x2, _y2};
 
-  SDL_SetRenderDrawColor(video.renderer, 200, 0, color, 255);
-  SDL_RenderFillRect(video.renderer, &r);
+  
 }
 
 void update()
@@ -245,7 +163,7 @@ void update()
         if (flags & SDL_WINDOW_FULLSCREEN)
         {
           SDL_SetWindowFullscreen(video.window, 0);
-          SDL_RenderSetLogicalSize(video.renderer, 100,100);
+          //SDL_RenderSetLogicalSize(video.renderer, 100,100);
           //SDL_RenderSetViewport(video.renderer, NULL);
         }
         else
@@ -253,7 +171,7 @@ void update()
           SDL_SetWindowFullscreen(video.window, SDL_WINDOW_FULLSCREEN_DESKTOP);
           SDL_Rect r{0,0,100,100};
           //SDL_RenderSetViewport(video.renderer, &r);
-          SDL_RenderSetLogicalSize(video.renderer, 0,0);
+          //SDL_RenderSetLogicalSize(video.renderer, 0,0);
           
           
         }
@@ -263,14 +181,14 @@ void update()
         if (flags & SDL_WINDOW_FULLSCREEN)
         {
           SDL_SetWindowFullscreen(video.window, 0);
-          SDL_RenderSetViewport(video.renderer, NULL);
+          //SDL_RenderSetViewport(video.renderer, NULL);
         }
         else
         {
           
           SDL_SetWindowFullscreen(video.window, SDL_WINDOW_FULLSCREEN);
           SDL_Rect r{0,0,100,100};
-          SDL_RenderSetViewport(video.renderer, &r);
+          //SDL_RenderSetViewport(video.renderer, &r);
           //SDL_RenderSetLogicalSize(video.renderer, 0,0);
         }
       }
@@ -418,14 +336,23 @@ void update()
 
 void startFrame()
 {
-  SDL_SetRenderDrawColor(video.renderer, 0, 0, 0, 255);
-  SDL_RenderClear(video.renderer);
-  SDL_RenderCopy(video.renderer, video.img, NULL, NULL);
+  static float c = 0.f;
+  if (c > 1.0f) {
+    c = 0;
+  }
+  glClearColor(0.0f, c, 0.0f, 1.0f);
+  c += 0.1f;
+  
+  glClear(GL_COLOR_BUFFER_BIT);
+  //SDL_SetRenderDrawColor(video.renderer, 0, 0, 0, 255);
+  //SDL_RenderClear(video.renderer);
+  //SDL_RenderCopy(video.renderer, video.img, NULL, NULL);
 }
 
 void drawFrame()
 {
-  SDL_RenderPresent(video.renderer);
+  SDL_GL_SwapWindow(video.window);
+  //SDL_RenderPresent(video.renderer);
 }
 
 void draw()

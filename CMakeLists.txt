@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 set (CMAKE_CXX_STANDARD 11)
 
-project(initproj LANGUAGES CXX)
+project(initproj LANGUAGES C CXX)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 if (WIN32)
@@ -9,7 +9,7 @@ if (WIN32)
 endif()
 
 add_executable(template)
-target_sources(template PRIVATE src/main.cpp)
+target_sources(template PRIVATE src/main.cpp src/main.hpp)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets/Image5.png
       DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/assets)
@@ -19,6 +19,12 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets/Image5.png
 if(${EMSCRIPTEN})
 
   set(CMAKE_VERBOSE_MAKEFILE ON)
+  target_include_directories(template PRIVATE gles3/include gles3/include/glad)
+  
+  target_sources(template PRIVATE gles3/src/glad.c)
+  target_sources(template PRIVATE gles3/include/glad/glad.h)
+  target_sources(template PRIVATE gles3/include/KHR/khrplatform.h)
+  target_sources(template PRIVATE src/em_main.cpp)
   
   if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 
@@ -38,7 +44,7 @@ if(${EMSCRIPTEN})
 
   endif()
 
-  target_sources(template PRIVATE src/em_main.cpp)
+  
   
   target_compile_options(template PRIVATE --use-port=sdl2)
   target_compile_options(template PRIVATE --use-port=sdl2_image:formats=bmp,png,xpm,jpg)
@@ -48,7 +54,7 @@ if(${EMSCRIPTEN})
   target_link_options(template PRIVATE --use-port=sdl2)
   target_link_options(template PRIVATE --use-port=sdl2_image:formats=bmp,png,xpm,jpg)
   target_link_options(template PRIVATE --use-port=sdl2_mixer:formats=ogg,mp3,mod,mid)
-  #target_link_options(template PRIVATE -sFULL_ES3=1 -sMIN_WEBGL_VERSION=2)
+  target_link_options(template PRIVATE -sFULL_ES3=1 -sMIN_WEBGL_VERSION=2)
   target_link_options(template PRIVATE --preload-file assets)
   target_link_options(template PRIVATE --shell-file ../shell.html)
   
@@ -59,6 +65,11 @@ else()
   find_package(SDL2)
   find_package(SDL2_image)
   find_package(SDL2_mixer)
+  
+  target_sources(template PRIVATE gl46/include/glad/glad.h)
+  target_sources(template PRIVATE gl46/include/KHR/khrplatform.h)
+  target_sources(template PRIVATE gl46/src/glad.c)
+  
   target_sources(template PRIVATE src/desktop_main.cpp)
 
   target_link_libraries(template PRIVATE SDL2_mixer::SDL2_mixer)

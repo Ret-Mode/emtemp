@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
+#include <SDL_ttf.h>
 #include "glad/glad.h"
 
 struct sdl_container
@@ -11,7 +12,8 @@ struct sdl_container
   SDL_Window *window;
   SDL_GLContext context;
   SDL_Texture *backbuffer;
-  SDL_Texture *img;
+  SDL_Surface *img;
+  TTF_Font *font;
   Mix_Music *mus;
   float pixelRatio;
   int sceneWidth;

@@ -18,6 +18,12 @@ void toggleFullscreen()
 void cleanup()
 {
   SDL_Log("Cleanup");
+  
+  if (video.font) {
+    TTF_CloseFont(video.font);
+  }
+  TTF_Quit();
+  
   if (video.mus)
   {
     Mix_HaltMusic();
@@ -29,11 +35,14 @@ void cleanup()
 
   if (video.img)
   {
-    SDL_DestroyTexture(video.img);
+    SDL_FreeSurface(video.img);
   }
 
   IMG_Quit();
-
+  
+  if (video.context) {
+    SDL_GL_DeleteContext(video.context);
+  }
   
   if (video.window)
   {
@@ -53,7 +62,6 @@ void drawRect(Sint32 x, Sint32 y, int color)
   SDL_Rect r{
       _x, _y, _x2, _y2};
 
-  
 }
 
 void drawRect(float x, float y, int color)

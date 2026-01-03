@@ -51,6 +51,11 @@ void init()
   }
   gladLoadGLES2Loader(SDL_GL_GetProcAddress);
 
+  SDL_Log((const char *)glGetString(GL_VENDOR));
+  SDL_Log((const char *)glGetString(GL_RENDERER));
+  SDL_Log((const char *)glGetString(GL_VERSION));
+  SDL_Log((const char *)glGetString(GL_SHADING_LANGUAGE_VERSION));
+  
   video.pixelRatio = 1.0f;
 
   if (IMG_Init(IMG_INIT_PNG) < 0)
@@ -60,7 +65,7 @@ void init()
     return;
   }
 
-  //video.img = IMG_LoadTexture(video.renderer, "assets/Image5.png");
+  video.img = IMG_Load( "assets/Image5.png");
 
   if (Mix_Init(MIX_INIT_MOD) < 0)
   {
@@ -76,6 +81,14 @@ void init()
   }
 
   video.mus = Mix_LoadMUS("assets/test.xm");
+  
+  if (TTF_Init() < 0){
+    SDL_Log("ttf failed");
+    cleanup();
+  }
+  
+  video.font = TTF_OpenFont("assets/testfont.ttf", 30);
+
   video.running = true;
 }
 

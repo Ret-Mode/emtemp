@@ -29,6 +29,7 @@ if(${EMSCRIPTEN})
   target_sources(template PRIVATE gles3/src/glad.c)
   target_sources(template PRIVATE gles3/include/glad/glad.h)
   target_sources(template PRIVATE gles3/include/KHR/khrplatform.h)
+  
   target_sources(template PRIVATE src/em_main.cpp)
   
   if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
@@ -50,19 +51,22 @@ if(${EMSCRIPTEN})
   endif()
 
   target_compile_options(template PRIVATE --use-port=sdl2)
-  target_compile_options(template PRIVATE --use-port=sdl2_image:formats=bmp,png,xpm,jpg)
-  target_compile_options(template PRIVATE --use-port=sdl2_mixer:formats=ogg,mp3,mod,mid)
+  target_compile_options(template PRIVATE --use-port=sdl2_image:formats=bmp,gif,lbm,pcx,png,pnm,tga,xcf,xpm,xv)
+  
+  target_compile_options(template PRIVATE --use-port=sdl2_mixer:formats=ogg,mod,mid)
   target_compile_options(template PRIVATE --use-port=sdl2_ttf)
   target_compile_options(template PRIVATE --use-port=freetype)
   target_compile_options(template PRIVATE --use-port=harfbuzz)
+  target_compile_options(template PRIVATE --use-port=sqlite3)
   
   target_link_options(template PRIVATE -sALLOW_MEMORY_GROWTH=1)
   target_link_options(template PRIVATE --use-port=sdl2)
-  target_link_options(template PRIVATE --use-port=sdl2_image:formats=bmp,png,xpm,jpg)
+  target_link_options(template PRIVATE --use-port=sdl2_image:formats=bmp,gif,lbm,pcx,png,pnm,tga,xcf,xpm,xv)
   target_link_options(template PRIVATE --use-port=sdl2_mixer:formats=ogg,mod,mid)
   target_link_options(template PRIVATE --use-port=sdl2_ttf)
   target_link_options(template PRIVATE --use-port=freetype)
   target_link_options(template PRIVATE --use-port=harfbuzz)
+  target_link_options(template PRIVATE --use-port=sqlite3)
   
   target_link_options(template PRIVATE -sFULL_ES3=1 -sMIN_WEBGL_VERSION=2)
   target_link_options(template PRIVATE --preload-file assets)
@@ -75,6 +79,9 @@ else()
   find_package(SDL2)
   find_package(SDL2_image)
   find_package(SDL2_mixer)
+  
+  target_precompile_headers(template PRIVATE src/pch.h)
+  target_include_directories(template PRIVATE gl46/include gl46/include/glad)
   
   target_sources(template PRIVATE gl46/include/glad/glad.h)
   target_sources(template PRIVATE gl46/include/KHR/khrplatform.h)

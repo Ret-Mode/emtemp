@@ -9,7 +9,8 @@ if (WIN32)
 endif()
 
 add_executable(template)
-target_sources(template PRIVATE src/main.cpp src/main.hpp)
+target_sources(template PRIVATE src/main.cpp src/main.hpp src/pch.h)
+target_include_directories(template PRIVATE external/rapidjson external/rapidxml)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets/Image5.png
       DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/assets)
@@ -22,6 +23,7 @@ if(${EMSCRIPTEN})
 
   set(CMAKE_VERBOSE_MAKEFILE ON)
   
+  target_precompile_headers(template PRIVATE src/pch.h)
   target_include_directories(template PRIVATE gles3/include gles3/include/glad)
   
   target_sources(template PRIVATE gles3/src/glad.c)
@@ -57,7 +59,7 @@ if(${EMSCRIPTEN})
   target_link_options(template PRIVATE -sALLOW_MEMORY_GROWTH=1)
   target_link_options(template PRIVATE --use-port=sdl2)
   target_link_options(template PRIVATE --use-port=sdl2_image:formats=bmp,png,xpm,jpg)
-  target_link_options(template PRIVATE --use-port=sdl2_mixer:formats=ogg,mp3,mod,mid)
+  target_link_options(template PRIVATE --use-port=sdl2_mixer:formats=ogg,mod,mid)
   target_link_options(template PRIVATE --use-port=sdl2_ttf)
   target_link_options(template PRIVATE --use-port=freetype)
   target_link_options(template PRIVATE --use-port=harfbuzz)

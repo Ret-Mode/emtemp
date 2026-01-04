@@ -11,7 +11,7 @@ static void mainloop(void) {
   draw();
 }
 
-void init()
+void init() 
 {
 
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER))
@@ -51,10 +51,10 @@ void init()
   }
   gladLoadGLES2Loader(SDL_GL_GetProcAddress);
 
-  SDL_Log((const char *)glGetString(GL_VENDOR));
-  SDL_Log((const char *)glGetString(GL_RENDERER));
-  SDL_Log((const char *)glGetString(GL_VERSION));
-  SDL_Log((const char *)glGetString(GL_SHADING_LANGUAGE_VERSION));
+  SDL_Log("%s", (const char *)glGetString(GL_VENDOR));
+  SDL_Log("%s", (const char *)glGetString(GL_RENDERER));
+  SDL_Log("%s", (const char *)glGetString(GL_VERSION));
+  SDL_Log("%s", (const char *)glGetString(GL_SHADING_LANGUAGE_VERSION));
   
   video.pixelRatio = 1.0f;
 

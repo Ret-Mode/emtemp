@@ -12,13 +12,20 @@ add_executable(template)
 target_sources(template PRIVATE src/main.cpp src/main.hpp src/pch.h)
 target_include_directories(template PRIVATE external/rapidjson external/rapidxml)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets/Image5.png
-      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/assets)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets/testfont.ttf
-      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/assets)
-#file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets/test.xm
-#      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/assets)
-      
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/assets/Image5.png)
+  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets/Image5.png
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/assets)
+endif()
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/assets/testfont.ttf)
+  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets/testfont.ttf
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/assets)
+endif()
+
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/assets/test.xm)
+  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets/test.xm
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/assets)
+endif()
+
 if(${EMSCRIPTEN})
 
   set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -79,18 +86,20 @@ else()
   find_package(SDL2)
   find_package(SDL2_image)
   find_package(SDL2_mixer)
+  find_package(SDL2_ttf)
   
   target_precompile_headers(template PRIVATE src/pch.h)
   target_include_directories(template PRIVATE gl46/include gl46/include/glad)
   
   target_sources(template PRIVATE gl46/include/glad/glad.h)
-  target_sources(template PRIVATE gl46/include/KHR/khrplatform.h)
+  target_sources(template PRIVATE gl46/include/KHR/khrplatform.h) 
   target_sources(template PRIVATE gl46/src/glad.c)
   
   target_sources(template PRIVATE src/desktop_main.cpp)
 
   target_link_libraries(template PRIVATE SDL2_mixer::SDL2_mixer)
   target_link_libraries(template PRIVATE SDL2_image::SDL2_image)
+  target_link_libraries(template PRIVATE SDL2_ttf::SDL2_ttf)
   target_link_libraries(template PRIVATE SDL2::SDL2 SDL2::SDL2main)
   
 
@@ -101,4 +110,3 @@ else()
     )
   endif()
 endif()
-

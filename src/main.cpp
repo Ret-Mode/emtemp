@@ -54,8 +54,8 @@ void cleanup()
 
 void drawRect(Sint32 x, Sint32 y, int color)
 {
-  int _x = x * video.pixelRatio;
-  int _y = y * video.pixelRatio;
+  int _x = (int)(x * video.pixelRatio);
+  int _y = (int)(y * video.pixelRatio);
   int _x2 = 100;
   int _y2 = 100;
 
@@ -66,8 +66,8 @@ void drawRect(Sint32 x, Sint32 y, int color)
 
 void drawRect(float x, float y, int color)
 {
-  int _x = x * video.sceneWidth * video.pixelRatio;
-  int _y = y * video.sceneHeight * video.pixelRatio;
+  int _x = (int)(x * video.sceneWidth * video.pixelRatio);
+  int _y = (int)(y * video.sceneHeight * video.pixelRatio);
   int _x2 = 100;
   int _y2 = 100;
 
@@ -272,8 +272,8 @@ void update()
         {
           SDL_Rect r;
           r.x = r.y = 0;
-          r.w = ev.data1 * video.pixelRatio;
-          r.h = ev.data2 * video.pixelRatio;
+          r.w = (int)(ev.data1 * video.pixelRatio);
+          r.h = (int)(ev.data2 * video.pixelRatio);
           video.sceneWidth = ev.data1;
           video.sceneHeight = ev.data2;
           SDL_Log("Resized to %d %d", ev.data1, ev.data2);

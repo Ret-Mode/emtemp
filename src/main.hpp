@@ -2,6 +2,7 @@
 #define __TEMP_MAIN_HPP
 
 //#include "pch.hpp"
+#include "sqlite3.h"
 
 struct sdl_container
 {

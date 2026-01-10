@@ -30,13 +30,15 @@ if(${EMSCRIPTEN})
 
   set(CMAKE_VERBOSE_MAKEFILE ON)
   
-  target_precompile_headers(template PRIVATE src/pch.h)
+  
   target_include_directories(template PRIVATE gles3/include gles3/include/glad)
   
   target_sources(template PRIVATE gles3/src/glad.c)
   target_sources(template PRIVATE gles3/include/glad/glad.h)
   target_sources(template PRIVATE gles3/include/KHR/khrplatform.h)
   
+  target_precompile_headers(template PRIVATE src/pch.h)
+
   target_sources(template PRIVATE src/em_main.cpp)
   
   if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
@@ -88,14 +90,18 @@ else()
   find_package(SDL2_mixer)
   find_package(SDL2_ttf)
   
-  target_precompile_headers(template PRIVATE src/pch.h)
   target_include_directories(template PRIVATE gl46/include gl46/include/glad)
   
   target_sources(template PRIVATE gl46/include/glad/glad.h)
   target_sources(template PRIVATE gl46/include/KHR/khrplatform.h) 
   target_sources(template PRIVATE gl46/src/glad.c)
   
+  target_include_directories(template PRIVATE external/sqlite3)
+  target_sources(template PRIVATE external/sqlite3/sqlite3.c external/sqlite3/sqlite3.h external/sqlite3/sqlite3ext.h)
+  
   target_sources(template PRIVATE src/desktop_main.cpp)
+
+  target_precompile_headers(template PRIVATE src/pch.h)
 
   target_link_libraries(template PRIVATE SDL2_mixer::SDL2_mixer)
   target_link_libraries(template PRIVATE SDL2_image::SDL2_image)
